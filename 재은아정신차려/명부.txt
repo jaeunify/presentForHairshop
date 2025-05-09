@@ -14,21 +14,5 @@
     }
   }
 
-,
-
-  {
-    "Name": "조철희2",
-    "Team": "dd",
-    "TelegramToken": "7829681305:AAEnjOQp8mSXldy9UyLhRsP3sfz5ktfCRdM",
-    "ChatId": "7415089515",
-    "AlramState": {
-      "취소알림": false,
-      "추가알림": false,
-      "입금대기알림": true,
-      "전체알림": true,
-      "알림범위": -1
-    }
-  }
-
 
 ]
