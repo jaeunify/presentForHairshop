@@ -40,13 +40,12 @@ public class MailManager
                     doc.LoadHtml(body);
                     var text = doc.DocumentNode.InnerText;
                     var mailInfo = new MailInfo(text);
-                    mails.Add(uid, mailInfo);
+                    mails.TryAdd(uid, mailInfo);
                 }
             }
 
             await inbox.AddFlagsAsync(uid, MessageFlags.Seen, true);
-        }
-
+        }   
         await client.DisconnectAsync(true);
 
         // 전체 메일을 돌며 알림 전송
