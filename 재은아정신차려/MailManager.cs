@@ -1,25 +1,18 @@
 using Telegram.Bot;
-using Telegram.Bot.Types;
-
-namespace 재은아정신차려;
-
-using System.Text.RegularExpressions;
-using System;
-using System.Threading.Tasks;
 using HtmlAgilityPack;
 using MailKit;
 using MailKit.Net.Imap;
 using MailKit.Search;
 
+namespace 재은아정신차려;
+
 public class MailManager
 {
-    private static string gmailUser = "chahongnw1207@gmail.com";
-    private static string gmailPassword = "tudv jlff qnul asqv";
-    private static string telegramToken = "7829681305:AAEnjOQp8mSXldy9UyLhRsP3sfz5ktfCRdM";
-    private static string chatId = "7415089515";
-    static TelegramBotClient bot = new TelegramBotClient(telegramToken);
-
-    public static Dictionary<UniqueId, MailInfo> mails = new();
+    private EmployeeManager employeeManager = new();
+    private string gmailUser = "chahongnw1207@gmail.com";
+    private string gmailPassword = "tudv jlff qnul asqv";
+    static TelegramBotClient bot = new("7829681305:AAEnjOQp8mSXldy9UyLhRsP3sfz5ktfCRdM");
+    public Dictionary<UniqueId, MailInfo> mails = new();
 
     public async Task Trigger()
     {
@@ -50,17 +43,34 @@ public class MailManager
                     mails.Add(uid, mailInfo);
                 }
             }
+
             await inbox.AddFlagsAsync(uid, MessageFlags.Seen, true);
         }
+
         await client.DisconnectAsync(true);
 
         // 전체 메일을 돌며 알림 전송
         foreach (var (_, mailInfo) in mails)
         {
-            await bot.SendMessage(chatId, mailInfo.FinalMessage);
+            foreach (var employee in employeeManager.GetAll())
+            {
+                if (!mailInfo.Receivers.Contains(employee.Name) && mailInfo.CheckNeedAlarm(employee))
+                {
+                    await bot.SendMessage(employee.ChatId, mailInfo.FinalMessage);
+                    mailInfo.Receivers.Add(employee.Name);
+                }
+            }
         }
 
         // 시간 지난 메일 dic에서 삭제
+        var expired = mails
+            .Where(pair => pair.Value.ReservationTime <= DateTime.Now)
+            .Select(pair => pair.Key)
+            .ToList();
         
+        foreach (var key in expired)
+        {
+            mails.Remove(key);
+        }
     }
 }

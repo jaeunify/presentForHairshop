@@ -6,6 +6,8 @@ class Program
 {
     static async Task Main(string[] args)
     {
+        var mailManager = new MailManager();
+        
         // 메일 작업 돌리기
         Task.Run(async () =>
         {
@@ -13,7 +15,7 @@ class Program
             {
                 try
                 {
-                    await new MailManager().Trigger();
+                    await mailManager.Trigger();
                 }
                 catch (Exception ex)
                 {
@@ -30,8 +32,6 @@ class Program
         // Add services to the container.
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
-
-        builder.Services.AddSingleton<EmployeeManager>();
         
         var app = builder.Build();
 
